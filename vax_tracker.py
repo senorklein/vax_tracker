@@ -33,7 +33,7 @@ def main():
         filtered = filter_results(data)
         for f in filtered:
             appointment_count = len(f["appointments"])
-            print(f"{f['city']}, {f['state']} {f['address']} {f['postal_code']} - {f['name']} -  {appointment_count} appts" )
+            print(f"{f['city']} : {f['state']} : {f['address']} : {f['postal_code']} : {f['name']} : {appointment_count} appts : {f['url']}" )
             
 
 if __name__ == "__main__":
