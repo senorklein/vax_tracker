@@ -4,6 +4,8 @@ import requests
 import argparse
 import twilio_imp
 import time
+import pytz
+from datetime import datetime
 
 def get_data(state):
         raw_data = requests.get( 'https://www.vaccinespotter.org/api/v0/states/' + state + '.json' )
@@ -66,8 +68,11 @@ def main():
         parser.add_argument( '-server' , '--server' , help='start it as server and check every 1 minute' , action="store_true")
         args = parser.parse_args()
         if args.server:
+
+            pst = pytz.timezone('America/Los_Angeles')
+            print("starting as a server")
             while(1):
-                print("starting as a server")
+                print(f"checking {datetime.now(pst)}")
                 do_stuff(args)
                 time.sleep(60)
         else:
