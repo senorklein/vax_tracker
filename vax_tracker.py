@@ -66,9 +66,10 @@ def main():
         parser.add_argument( '-server' , '--server' , help='start it as server and check every 1 minute' , action="store_true")
         args = parser.parse_args()
         if args.server:
-            print("starting as a server")
-            do_stuff(args)
-            time.sleep(60)
+            while(1):
+                print("starting as a server")
+                do_stuff(args)
+                time.sleep(60)
         else:
             do_stuff(args)
 
