@@ -1,5 +1,9 @@
 import json
 
+###
+"""
+Create a config.json file with the actual values of each the below settings
+"""
 #
 config = {
         "twilio_account_sid": "unknown",
