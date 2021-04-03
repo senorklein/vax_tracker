@@ -2,7 +2,8 @@
 
 import requests
 import argparse
-
+import twilio_imp
+import time
 
 def get_data(state):
         raw_data = requests.get( 'https://www.vaccinespotter.org/api/v0/states/' + state + '.json' )
@@ -35,6 +36,24 @@ def load_zips(zip, distance):
 
 
 
+def do_stuff(args):
+        data = get_data(args.state_code)
+        filtered = filter_results(data, args.zip_code, args.distance_radius)
+        text_report = []
+        if len(filtered) == 0:
+            print(f"no appointents found in {args.distance_radius} miles of {args.zip_code}")
+            return
+        for f in filtered:
+            appointment_count = len(f["appointments"])
+            print(f"{f['city']} : {f['state']} : {f['address']} : {f['postal_code']} : {f['name']} : {appointment_count} appts : {f['url']}" )
+            msg = f"{appointment_count} | {f['city']} {f['name']} {f['postal_code']}"
+            text_report.append(msg)
+            
+        if args.sms_phone_number != "" and len(text_report) > 0:
+            print("sending results")
+            twilio_imp.send_sms(args.sms_phone_number, "\n".join(text_report))
+
+
 
 
 
@@ -43,13 +62,16 @@ def main():
         parser.add_argument( '-s' , '--state-code' , help='Specify the state code of the JSON from https://www.vaccinespotter.org/api/ ( default: CA )' , default="CA" )
         parser.add_argument( '-z' , '--zip-code' , help='Specify the zip code to search within )' , default="95125" )
         parser.add_argument( '-d' , '--distance-radius' , help='Specify the distance radius to pick which zips file)' , default="30" )
+        parser.add_argument( '-n' , '--sms_phone_number' , help='Specify what phone number to sms the results to' , default="")
+        parser.add_argument( '-server' , '--server' , help='start it as server and check every 1 minute' , action="store_true")
         args = parser.parse_args()
-        data = get_data(args.state_code)
-        filtered = filter_results(data, args.zip_code, args.distance_radius)
-        for f in filtered:
-            appointment_count = len(f["appointments"])
-            print(f"{f['city']} : {f['state']} : {f['address']} : {f['postal_code']} : {f['name']} : {appointment_count} appts : {f['url']}" )
-            
+        if args.server:
+            print("starting as a server")
+            do_stuff(args)
+            time.sleep(60)
+        else:
+            do_stuff(args)
+
 
 if __name__ == "__main__":
     # execute only if run as a script
