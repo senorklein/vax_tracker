@@ -22,6 +22,8 @@ def filter_results(data, zip, distance):
     return ret
 
 def load_zips(zip, distance):
+    # zips are in the format from this website;
+    # https://www.zipcodeapi.com/API#radius
     zfile = open(f"zips_{zip}_{distance}.txt", "+r")
     zfile_list = zfile.readlines()
     zips = []
