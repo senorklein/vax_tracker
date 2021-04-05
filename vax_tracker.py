@@ -44,7 +44,7 @@ def do_stuff(args):
         text_report = []
         if len(filtered) == 0:
             print(f"no appointents found in {args.distance_radius} miles of {args.zip_code}")
-            return
+            return 0
         for f in filtered:
             appointment_count = len(f["appointments"])
             print(f"{f['city']} : {f['state']} : {f['address']} : {f['postal_code']} : {f['name']} : {appointment_count} appts : {f['url']}" )
@@ -54,6 +54,7 @@ def do_stuff(args):
         if args.sms_phone_number != "" and len(text_report) > 0:
             print("sending results")
             twilio_imp.send_sms(args.sms_phone_number, "\n".join(text_report))
+        return len(filtered)
 
 
 
@@ -69,11 +70,17 @@ def main():
         args = parser.parse_args()
         if args.server:
 
+            if args.sms_phone_number != "":
+                twilio_imp.send_sms(args.sms_phone_number, "Starting vaccine tracker on this number (yell at erik to stop)")
+
             pst = pytz.timezone('America/Los_Angeles')
             print("starting as a server")
             while(1):
                 print(f"checking {datetime.now(pst)}")
-                do_stuff(args)
+                len = do_stuff(args)
+                if len > 0:
+                    print("found something, stopping server")
+                    exit()
                 time.sleep(60)
         else:
             do_stuff(args)
